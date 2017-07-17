@@ -1,0 +1,19 @@
+{
+  "name": "treeflow",
+  "version": "1.0.0",
+  "description": "A React+Mobx+Socket single way flow data visualization and analytics generator. ",
+  "main": "JViewCompiler.js",
+  "scripts": {
+    "test": "node JViewCompiler.js Config.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gazcn007/treeflow.git"
+  },
+  "author": "Carl Liu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gazcn007/treeflow/issues"
+  },
+  "homepage": "https://github.com/gazcn007/treeflow#readme"
+}
