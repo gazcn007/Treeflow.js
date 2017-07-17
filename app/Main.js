@@ -1,0 +1,2 @@
+// Root File for The Tree Flow app
+import React from 'react';import ReactDOM from 'react-dom';import createBrowserHistory from 'history/createBrowserHistory';import { Provider } from 'mobx-react';import { BrowserRouter as Router, Route , hashHistory} from 'react-router-dom';import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';

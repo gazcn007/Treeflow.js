@@ -14,6 +14,7 @@ fs.readFile(process.argv[2], 'utf8', function(err,data){
     }
     config = JSON.parse(data);
     // webpackGenerator();
-    pageGenerator(config.pages);
+    pageGenerator(config.pages, config.path);
+    // main.js Generator
 })
 

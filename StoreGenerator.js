@@ -36,7 +36,7 @@ module.exports = function(storeName, panel, pageDirectory){
                     e.trigger = 'changeValue';
                     e.value = panel.store[e.param] ? panel.store[e.param] : 0;
                 })
-                ws.writeLine("const formList = "+JSON.stringify(panel.formList, null, 4)+"\n");
+                ws.writeLine("const formList = "+JSON.stringify(panel.formList, null, 4));
             } else {
                 console.log ("FormList is missing on a formset panel");
                 throw err;

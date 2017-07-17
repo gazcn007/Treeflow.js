@@ -63,7 +63,6 @@ const formList = [
         "value": "0"
     }
 ]
-
 const actionList = undefined
 return {                formList: formList,                actionList: actionList,                className: ' formset2 whiteBgColor',                columns: 1            }
 }
