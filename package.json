@@ -2,9 +2,9 @@
   "name": "treeflow",
   "version": "1.0.0",
   "description": "A React+Mobx+Socket single way flow data visualization and analytics generator. ",
-  "main": "JViewCompiler.js",
+  "main": "ViewCompiler.js",
   "scripts": {
-    "test": "node JViewCompiler.js Config.json"
+    "test": "node ViewCompiler.js Config.json"
   },
   "repository": {
     "type": "git",
