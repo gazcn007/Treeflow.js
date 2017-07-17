@@ -128,13 +128,13 @@ const RoutingStores = (storeNames)=>{
 const MainAppView = (pageRoutes,pageNames) =>{
     return "var routes = ["+
         pageRoutes.map((route,idx)=>{
-            return "{dispLabel: \'"+pageNames[idx]+"', route:'"+route+"'},"
+            return "{dispLabel: '"+pageNames[idx]+"', route:'"+route+"'},"
         }).join(',')
         +"];\
     ReactDOM.render(\
     <Provider {...stores}><Router history={browserHistory}><div><NavBar routes={routes}/>"+
         pageRoutes.map((route,idx)=>{
                         return "<Route path=\'"+route+"\' component={"+pageNames[idx]+"}/>";
-                    }).join('\'')+ "</div></Router></Provider>, app)"
+                    }).join('\n')+ "</div></Router></Provider>, app)"
 }
 

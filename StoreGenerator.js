@@ -41,7 +41,7 @@ module.exports = function(storeName, panel, pageDirectory){
                 throw err;
             }
             if(panel.actionList){
-                ws.writeLine("const actionList = "+JSON.stringify(panel.actionlist, null, 4));
+                ws.writeLine("const actionList = "+JSON.stringify(panel.actionList, null, 4));
             } else {
                 console.log ("FormList is missing on a formset panel");
                 throw err;
