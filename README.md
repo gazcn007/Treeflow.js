@@ -2,6 +2,8 @@
 
 ![](/doc/treeflow.png)
 
+"The purpose of art is washing the dust of daily life off our souls"
+
 ## Introduction
 
 Treeflow.js is a generic visualization library that utilizes React.js, Mobx.js, Node.js and Socket.io to generate dynamic and synchronized front end view of any real-time dataflow. The main advantage of using this technology stack is that it utilizes the concept of one-way data flow (so-called one-way binding) and component hierarchy of React framework so that the view is synchronized with any data flow and the user can dynamically change the view structure by reorganizing the components with standard APIs.
