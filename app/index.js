@@ -1,4 +1,0 @@
-// Root File for Node Service 
-const express = require('express');const http = require('http');const bodyParser = require('body-parser');const socketIo = require('socket.io');const webpack = require('webpack');const webpackDevMiddleware = require('webpack-dev-middleware');const webpackConfig = require('./webpack.config.js');const app = express();const server = http.createServer(app);const io = socketIo(server);
-webpackConfig.plugins.push(new webpack.HotModuleReplacementPlugin());app.use(express.static(__dirname+'/'));app.use(webpackDevMiddleware(webpack(webpackConfig)));app.use(bodyParser.urlencoded({extended:false}));app.use(require('webpack-hot-middleware')(webpack(webpackConfig)));
-server.listen(3000);    app.get('*', (req, res) => {    console.log('Orignal Path: ' + req.url);    res.sendFile(__dirname+'/index.html');    });
