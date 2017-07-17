@@ -19,17 +19,16 @@ module.exports = function(storeName, panel, pageDirectory){
         ws.writeLine(StoreFileDependencies);
         ws.writeLine(ClassName(storeName));
 
-        // map user inputed values
-        if(panel.store) {
-            ws.writeLine("@observable map = " + JSON.stringify(panel.store));
-        } else {
-            console.log ('Store is missing on panel'+storeName);
-            throw err;
-        }
-
         //write
         ws.writeLine(BasicFunctions);
-        if (panel.type.toLowerCase() == 'formset'){
+        if (panel.type == 'formset'){
+            // map user inputed values , formset is represented by map
+            if(panel.store) {
+                ws.writeLine("@observable map = " + JSON.stringify(panel.store));
+            } else {
+                console.log ('Store is missing on panel'+storeName);
+                throw err;
+            }
             ws.writeLine("@computed get formset(){\n");
             if(panel.formList){
                 panel.formList.forEach(e=>{
@@ -55,12 +54,39 @@ module.exports = function(storeName, panel, pageDirectory){
                 columns: 1\
             }")
             ws.writeLine("}")
-        } else if (panel.type.toLowerCase()  == 'fixtable') {
-            
+        } else if (panel.type  == 'table') {
+            // map user inputed values , table is represented by array
+            if(panel.store) {
+                ws.writeLine("@observable array = " + JSON.stringify(panel.store));
+            } else {
+                console.log ('Store is missing on panel'+storeName);
+                throw err;
+            }
+            // form header based on headers definition in the Config.json
+            ws.writeLine("@computed get table(){\n");
+            ws.writeLine("const headers = "+JSON.stringify(panel.headers));
+            ws.writeLine("var centerBody = this.array.map(entry => {\
+                                return (entry.map(e=>{\
+                                        return {type:'plain', valueLabel: e};\
+                                    }));\
+                                }).map(e=>{return {className: '',list: e};});");
+            ws.writeLine("var arrayOfCheckBoxes =this.array.map(e=>{\
+            return({\
+                className: '',\
+                list: [{type: 'checkbox', param: 1, value: false, trigger: 'setCheckBox', className: 'td-text-center'}]\
+            });});");
+            // return the render ready obj data
+            ws.writeLine("return {\
+                leftHeader: [{type: 'checkbox', value: false, trigger: 'selectAll', className: 'td-text-center'}],\
+                leftBody: arrayOfCheckBoxes,\
+                rightHeader: [],\
+                centerHeader: headers,\
+                rightBody: [],\
+                centerBody: centerBody}");
+            ws.writeLine('}');
         } 
         ws.writeLine(ClassFooter(storeName));
     });
-    
 }
 
 const StoreFileDir = (pageDirectory,storeName) => {return pageDirectory+'/'+storeName+'.js'};

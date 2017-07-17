@@ -22,8 +22,10 @@ module.exports = function (pages, path) {
                 var storeName = StoreFileName(panel.type);
                 storeNames.push(storeName);
                 storeDirectories.push('./'+page.name.replace(/\s/g, '')+'/'+storeName);
+                // Take Type and convert it to LowerCase to deal with different typing variations
+                panel.type = panel.type.replace(" ","").toLowerCase();
                 storeGenerator(storeName, panel, PageDirectory(page.name, path)); //@ todo future problem with too many files with the same name?
-                if (panel.type.toLowerCase() == 'formset') {
+                if (panel.type == 'formset') {
                     // Default methods for FormSet
                     panelStoreConnectors.push("const " + storeName + "_formset = this.props."+storeName+".formset;\nconst " + storeName + "Config = {\
                         reset: this.props." + storeName + ".reset.bind(this.props." + storeName + "),\
@@ -32,6 +34,12 @@ module.exports = function (pages, path) {
                     panelViews.push("<Panel title = \"" + panel.type + "\">\
                         <FormSet {..." + storeName + "_formset} {..." + storeName + "Config } />\
                     </Panel>");
+                } else if (panel.type == 'table') {
+                    panelStoreConnectors.push("const " + storeName + "_table = this.props."+storeName+".table;");
+                    panelViews.push("<Panel title = \"" + panel.type + "\">\
+                        <FixTable leftCol='1' rightCol='0' left='45' right='0' className='td-inner-txt'\
+                    tableList={"+storeName + "_table}/>\
+                        </Panel>")
                 }
             });
 
@@ -86,10 +94,10 @@ const StoreFileName = (panelName) => {return panelName+'Store'};
 const RootFileName = (pageName,path) => {return PageDirectory(pageName,path)+'/index.js'};
 const RootFileDependencies = "import React from 'react';\
 import {inject, observer} from 'mobx-react';\
-import {Panel, FormSet, NavBar} from 'Components';\
+import {Panel, FormSet, NavBar, FixTable} from 'Components';\
 import io from 'socket.io-client';"
 const StoreInjection = (storeNames) => {
-    return "@inject(\""+storeNames.map(e=>e+'').toString()+"\")\n@observer"
+    return "@inject(\""+storeNames.map(e=>e+'').join('\",\"')+"\")\n@observer"
 };
 const ClassHeader = (pageName) => {return "export default class "+pageName+" extends React.Component {"};
 const ClassFooter = "}\n};"
