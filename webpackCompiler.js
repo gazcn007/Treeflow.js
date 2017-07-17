@@ -1,15 +1,15 @@
-const fs = require('fs')
+const fsPath = require('fs-path');
 
 const webpackSettings="var debug = process.env.NODE_ENV !== 'production';\n\
 var webpack = require('webpack');\n\
 var path = require('path');\n\
 module.exports = {\n\
-    context: path.join(__dirname, 'client/src'),\n\
+    context: path.join(__dirname, '/'),\n\
     devtool: debug ? 'inline-sourcemap' : null,\n\
     entry: [\n\
         'webpack/hot/dev-server',\n\
         'webpack-hot-middleware/client',\n\
-        './js/main.js',\n\
+        './Main.js',\n\
     ],\n\
     module: {\n\
         loaders: [\n\
@@ -36,11 +36,11 @@ module.exports = {\n\
         historyApiFallback: true\n\
     },\n\
     resolve:{\n\
-        root:[path.resolve(__dirname, 'client/src/lib'),path.resolve(__dirname,'node_modules')],\n\
+        root:[path.resolve(__dirname, 'lib'),path.resolve(__dirname,'node_modules')],\n\
         extensions:['','.js']\n\
     },\n\
     output: {\n\
-        path: path.join(__dirname, 'client/src'),\n\
+        path: path.join(__dirname, '/'),\n\
         filename: 'main.min.js',\n\
         publicPath:'/'\n\
     },\n\
@@ -51,6 +51,8 @@ module.exports = {\n\
     ]\n\
 };"
 
-module.exports = () => {
-    fs.writeFile('./webpack.config.js', webpackSettings);
+module.exports = (path) => {
+    fsPath.writeFile(path+'/webpack.config.js', webpackSettings, function(err){
+        if (err) throw err;
+    });
 }

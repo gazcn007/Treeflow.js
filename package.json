@@ -37,6 +37,8 @@
     "mobx-react": "^3.5.1",
     "mobx-react-router": "^4.0.1",
     "mongoose": "^4.11.0",
+    "ncp": "^2.0.0",
+    "promise": "^8.0.1",
     "react": "^15.2.1",
     "react-addons-test-utils": "^15.3.0",
     "react-dom": "^15.3.0",

@@ -71,5 +71,5 @@ export default store"
 }
 const StoreFileDependencies = "import { autorun, observable, computed} from 'mobx';"
 
-const BasicFunctions = "reset(){this.array1=this.array1.map(e=>{return 0})}\
-changeValue(value,param){this.array1[param]=value;}"
+const BasicFunctions = "reset(){this.map=this.map.map(e=>{return 0})}\
+changeValue(value,param){this.map[param]=value;}"

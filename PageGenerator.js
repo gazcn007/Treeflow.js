@@ -3,32 +3,31 @@ var fs = require('fs');
 var storeGenerator = require('./StoreGenerator.js');
 
 module.exports = function (pages, path) {
-    var storeNames = []
-    /*saves Store Names*/
-    var storeDirectories = []
-    /*saves Store Names*/
-    var pageNames = []
-    /*saves Page names */
+    var storeNames = []/*saves Store Names*/
+    var storeDirectories = [] /*saves Store Directories*/
+    var pageNames = [] /*saves Page names */
+    var pageRoutes = [] /*saves Page routes for MainAppView() to bind pages together with react-router*/
     pages.map(page=> {
+        pageRoutes.push(page.route);
         var panelViews = []
         /*saves code block for static jsx panel view*/
         var panelStoreConnectors = []
         /*saves connectors code block in React component to the stores*/
         if (page.name) {
-            pageNames.push(page.name);
+            pageNames.push(page.name.replace(/\s/g, ''));
             // dive into the panels first, because you need to know the list of stores needed for your panels
             // so you need to generate data layers files before writing to index.js, the main page
             // also within this mapping function, the static view code block has to be generated, so that it just need to be appened later on
             page.panels.map((panel, idx)=> {
                 var storeName = StoreFileName(panel.type);
                 storeNames.push(storeName);
-                storeDirectories.push(PageDirectory(page.name, path) + '/' + storeName);
+                storeDirectories.push('./'+page.name.replace(/\s/g, '')+'/'+storeName);
                 storeGenerator(storeName, panel, PageDirectory(page.name, path)); //@ todo future problem with too many files with the same name?
                 if (panel.type.toLowerCase() == 'formset') {
-                    panelStoreConnectors.push("const {" + storeName + "_formset} = this.props." + storeName + ";\nconst " + storeName + "Config = {\
+                    // Default methods for FormSet
+                    panelStoreConnectors.push("const " + storeName + "_formset = this.props."+storeName+".formset;\nconst " + storeName + "Config = {\
                         reset: this.props." + storeName + ".reset.bind(this.props." + storeName + "),\
-                        changeValue: this.props." + storeName + ".changeValue.bind(this.props." + storeName + "),\
-                        addData: this.addData.bind(this)\
+                        changeValue: this.props." + storeName + ".changeValue.bind(this.props." + storeName + ")\
                     }");
                     panelViews.push("<Panel title = \"" + panel.type + "\">\
                         <FormSet {..." + storeName + "_formset} {..." + storeName + "Config } />\
@@ -68,15 +67,26 @@ module.exports = function (pages, path) {
             ws.write(str);
         };
         ws.writeLine(MainFileDependencies);
+        ws.writeLine(storeNames.map((e,idx)=>{
+            return StoreImport(storeDirectories[idx],e);
+        }).join(';'));
+        ws.writeLine(pageNames.map(e=>{
+            return "import "+e+" from "+ "'./"+e+'\'';
+        }).join(';'));
+        ws.writeLine(RouterHistorySetup);
+        ws.writeLine(RoutingStores(storeNames));
+        ws.writeLine(MainAppView(pageRoutes,pageNames));
     });
 }
+
 // Static Asset for Code Generation utils for Pages
+// @todo currently unreadable and very ugly, find a better way to code these lines
 const PageDirectory = (pageName, path) => {return path+'/'+pageName.replace(/\s/g, '')};
 const StoreFileName = (panelName) => {return panelName+'Store'};
 const RootFileName = (pageName,path) => {return PageDirectory(pageName,path)+'/index.js'};
 const RootFileDependencies = "import React from 'react';\
 import {inject, observer} from 'mobx-react';\
-import {Panel, FormSet} from 'Components';\
+import {Panel, FormSet, NavBar} from 'Components';\
 import io from 'socket.io-client';"
 const StoreInjection = (storeNames) => {
     return "@inject(\""+storeNames.map(e=>e+'').toString()+"\")\n@observer"
@@ -86,8 +96,37 @@ const ClassFooter = "}\n};"
 
 // Static Asset for Code Generation utils For Main.js
 const MainFileDependencies = "import React from 'react';\
+// Import boilerplates\n\
 import ReactDOM from 'react-dom';\
 import createBrowserHistory from 'history/createBrowserHistory';\
 import { Provider } from 'mobx-react';\
 import { BrowserRouter as Router, Route , hashHistory} from 'react-router-dom';\
-import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';"
+import { RouterStore, syncHistoryWithStore } from 'mobx-react-router';\
+import {NavBar} from 'Components';\
+const app = document.getElementById('app');\
+// Import Mobx Stores :"
+
+const StoreImport = (storeDirectory, storeName) => {
+    return "import "+storeName+" from '"+storeDirectory+"';"
+}
+
+const RouterHistorySetup = "const browserHistory = createBrowserHistory();\
+const routingStore = new RouterStore();\
+const history = syncHistoryWithStore(browserHistory, routingStore);"
+const RoutingStores = (storeNames)=>{
+    return "var stores = {routingStore,"+storeNames.map(e=>{return e+""}).toString()+"};";
+}
+
+const MainAppView = (pageRoutes,pageNames) =>{
+    return "var routes = ["+
+        pageRoutes.map((route,idx)=>{
+            return "{dispLabel: \'"+pageNames[idx]+"', route:'"+route+"'},"
+        }).join(',')
+        +"];\
+    ReactDOM.render(\
+    <Provider {...stores}><Router history={browserHistory}><div><NavBar routes={routes}/>"+
+        pageRoutes.map((route,idx)=>{
+                        return "<Route path=\'"+route+"\' component={"+pageNames[idx]+"}/>";
+                    }).join('\'')+ "</div></Router></Provider>, app)"
+}
+

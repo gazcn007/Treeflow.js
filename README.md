@@ -18,3 +18,15 @@ The overview of the stack works as follows:
 - socket.io is hosted by Node.js when the Node service starts to run. It is a wrap up of Websocket APIs of the TCP socket. It will act as a messaging hub for data in-flow and view out-flow.
 - Mobx.js is the data layer of all non-stateless React components. It tells when and what the react components should render.
 - React.js is the main View layer that communicates with the client. It includes two important libraries, View Components and ECharts Adaptor. View Components include all the default  React components written in ES6 that can be reused anytime, including basic Form and Text input to Calendar Selector. The style sheets are included for all the components as well using LESS, so the colour scheme and layout can be changed dynamically based on client preference and demand as well. ECharts Adaptor is a wrap up library of ECharts 2.0, an open source library built by Baidu.inc, to match with View APIs.
+
+## To Test:
+```
+// Generate from Config.json
+npm test 
+// Open the directory Generated
+cd app
+// install all dependencies
+npm install
+// Starts node server
+node index.js 
+```
