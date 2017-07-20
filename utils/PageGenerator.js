@@ -7,6 +7,7 @@ module.exports = function (pages, path) {
     var storeDirectories = [] /*saves Store Directories*/
     var pageNames = [] /*saves Page names */
     var pageRoutes = [] /*saves Page routes for MainAppView() to bind pages together with react-router*/
+    var socketIONeeded = false;
     pages.map(page=> {
         pageRoutes.push(page.route);
         var panelViews = []
@@ -31,7 +32,7 @@ module.exports = function (pages, path) {
                         reset: this.props." + storeName + ".reset.bind(this.props." + storeName + "),\
                         changeValue: this.props." + storeName + ".changeValue.bind(this.props." + storeName + ")\
                     }");
-                    panelViews.push("<Panel title = \"" + panel.type + "\">\
+                    panelViews.push("<Panel title = \"" + page.name + panel.type + "\">\
                         <FormSet {..." + storeName + "_formset} {..." + storeName + "Config } />\
                     </Panel>");
                 } else if (panel.type == 'table') {
@@ -40,6 +41,12 @@ module.exports = function (pages, path) {
                         <FixTable leftCol='1' rightCol='0' left='45' right='0' className='td-inner-txt'\
                     tableList={"+storeName + "_table}/>\
                         </Panel>")
+                } else if (panel.type == 'scatter'){
+                    socketIONeeded=true;
+                    panelStoreConnectors.push("const " + storeName + "_scatter = this.props."+storeName+".scatter;");
+                    panelViews.push("<Panel title = \"" + panel.type + "\">\
+                        <Echarts style={{width:'100%',height:'365px'}} option={"+storeName+"_scatter}/>\
+                    </Panel>");
                 }
             });
 
@@ -57,6 +64,16 @@ module.exports = function (pages, path) {
                 ws.writeLine(RootFileDependencies);
                 ws.writeLine(StoreInjection(storeNames))
                 ws.writeLine(ClassHeader(page.name.replace(" ", "")));
+                if(socketIONeeded){
+                    ws.writeLine("componentDidMount(){\
+                        if(!this.socket) {\
+                            this.socket = io.connect('/');\
+                            this.socket.on('newDataPoint', function(data){\
+                                this.props.ScatterStore.addDataPoints(data.body.x, data.body.y);\
+                            }.bind(this));\
+                        }\
+                    }");
+                }
                 ws.writeLine("render(){" + panelStoreConnectors[0]);
                 ws.writeLine("return (" + panelViews[0] + ")");
                 ws.writeLine(ClassFooter);
@@ -95,7 +112,8 @@ const RootFileName = (pageName,path) => {return PageDirectory(pageName,path)+'/i
 const RootFileDependencies = "import React from 'react';\
 import {inject, observer} from 'mobx-react';\
 import {Panel, FormSet, NavBar, FixTable} from 'Components';\
-import io from 'socket.io-client';"
+import io from 'socket.io-client';\
+import Echarts from 'Echarts/Echarts';"
 const StoreInjection = (storeNames) => {
     return "@inject(\""+storeNames.map(e=>e+'').join('\",\"')+"\")\n@observer"
 };

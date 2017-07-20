@@ -1,6 +1,6 @@
 const fs = require('fs');
-const fsPath = require('fs-path')
-
+const fsPath = require('fs-path');
+const EchartAdaptor = require('./EchartAdaptor');
 /*
  @ storeName -> just str.concat(panel,'Store.js')
  @ stores -> stores to be generated
@@ -84,7 +84,13 @@ module.exports = function(storeName, panel, pageDirectory){
                 rightBody: [],\
                 centerBody: centerBody}");
             ws.writeLine('}');
-        } 
+        } else if(panel.type == 'scatter') {
+            // initialize an empty array so that when socket.io emits messages in, it will store the data in the array
+            ws.writeLine("@observable array = [[],[]];");
+            // form  based on headers definition in the Config.json
+            ws.writeLine("@computed get scatter"+EchartAdaptor.scatter.toString().replace('function',''));
+            ws.writeLine("addDataPoints (x,y){this.array[0].push([x,y])};");
+        }
         ws.writeLine(ClassFooter(storeName));
     });
 }

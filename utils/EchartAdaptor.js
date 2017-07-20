@@ -1,15 +1,86 @@
-export function formater (dataPoints, showType){
-    switch (showType) {
-        case 'scatter':
-            return format_scatter(dataPoints);
-        case 'pie':
-            return format_pie(dataPoints);
-        case 'graph':
-            return format_graph(dataPoints);
-        default:
-            return format_scatter(dataPoints);
+// dataPoints/logger is supposed to be a [[][]] : array of 2d vectors
+
+module.exports = {
+    format_scatter(){
+    },
+    format_pie(){
+    },
+    format_graph(){
+    },
+    scatter: function () {
+        var devices = this.array.toJSON().map(device => (device.toJSON()));
+        var data = [];
+        devices.forEach(function (e) {
+            data.push(e.map(dataPoints => dataPoints.toJSON()))
+        });
+
+        var option = {
+        title: {
+            text: 'Linear Regression',
+            subtext: '',
+            left: 'center'
+        },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer:{
+                type: 'cross'
+            }
+        },
+        xAxis:{
+            type: 'value',
+            splitLine:{
+                lineStyle:{
+                    type: 'dashed'
+                }
+            },
+        },
+        yAxis:{
+            type:'value',
+            min:1.5,
+            splitLine:{
+                lineStyle:{
+                    type:'dashed'
+                }
+            },
+        },
+        series: [
+            {
+                name: 'device-0',
+                type: 'scatter',
+                label: {
+                    emphasis:{
+                        show: true,
+                        position: 'left',
+                        textStyle:{
+                            color: 'black',
+                            fontSize: 16
+                        }
+                    }
+                },
+                data:data[0]
+            },
+            {
+                name: 'device-1',
+                type: 'scatter',
+                label: {
+                    emphasis:{
+                        show: true,
+                        position: 'left',
+                        textStyle:{
+                            color: 'red',
+                            fontSize: 16
+                        }
+                    }
+                },
+                data:data[1]
+            }
+        ]
+    };
+    return option;
     }
+
 }
+
 
 function format_scatter(dataPoints) {
     var option = {
@@ -123,10 +194,10 @@ function format_pie(dataPoints){
 }
 
 function format_graph(dataPoints){
-    let xArray1 = dataPoints[0].map(e=>{e[0]})
-    let xArray2 = dataPoints[1].map(e=>{e[0]})
-    let yArray1 = dataPoints[0].map(e=>{e[1]})
-    let yArray2 = dataPoints[1].map(e=>{e[1]})
+    var xArray1 = dataPoints[0].map(e=>{e[0]})
+    var xArray2 = dataPoints[1].map(e=>{e[0]})
+    var yArray1 = dataPoints[0].map(e=>{e[1]})
+    var yArray2 = dataPoints[1].map(e=>{e[1]})
 
     var option={
         title:{

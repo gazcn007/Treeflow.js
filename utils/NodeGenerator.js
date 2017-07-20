@@ -3,7 +3,23 @@ var fsPath = require('fs-path');
 var fs = require('fs');
 var storeGenerator = require('./StoreGenerator.js');
 
-module.exports = function (path, port) {
+module.exports = {
+    expressSetup:function (path, port) {
+        fsPath.writeFile(path+'/index.js', '// Root File for Node Service ', function (err, data) {
+            if(err) throw err;
+            console.log('Index.js Written');
+            // Create a write stream, and add in/extend with the writeLine() method
+            var ws = fs.createWriteStream(path+'/index.js', {flags: 'a'})
+            ws.writeLine = (str)=> {
+                ws.write('\n');
+                ws.write(str);
+            };
+            ws.writeLine(ImportDependencies);
+            ws.writeLine(WebpackSetup);
+            ws.writeLine(AppSetup(port));
+        });
+    },
+    socketSetup: function (path,socketId) {
     fsPath.writeFile(path+'/index.js', '// Root File for Node Service ', function (err, data) {
         if(err) throw err;
         console.log('Index.js Written');
@@ -13,11 +29,13 @@ module.exports = function (path, port) {
             ws.write('\n');
             ws.write(str);
         };
-        ws.writeLine(ImportDependencies);
-        ws.writeLine(WebpackSetup);
-        ws.writeLine(AppSetup(port));
+        ws.writeLine(SocketIOSetup);
     });
+    }
 }
+
+
+
 
 // Static boilerplates
 const ImportDependencies = "const express = require('express');\
@@ -43,3 +61,22 @@ const AppSetup = (port) => {
     });";
 };
 
+const SocketIOSetup = "io.on('connection', socket => {\
+console.log('connected');\
+socket.on('message', body =>{\
+    socket.broadcast.emit('message', {\
+        body,\
+        from: socket.id.slice(8)\
+    });\
+});\
+socket.on('newDataPoint', body =>{\
+    console.log('new data point received: '+body.x+','+body.y);\
+    socket.broadcast.emit('newDataPoint', {\
+        body,\
+        from: socket.id.slice(8)\
+    });\
+});\
+socket.on('disconnect', function() {\
+    console.log('disconnect');\
+});\
+});"

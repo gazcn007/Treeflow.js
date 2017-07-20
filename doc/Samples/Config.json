@@ -89,21 +89,47 @@
       ]
     },
     {
-      "name" : "Dashboard",
-      "route" : "/dashboard",
+      "name" : "Data Dashboard",
+      "route" : "/data-dashboard",
       "layout" : "default",
       "panels" : [
         {
-          "type": "Scatter",
-          "store": {
-            "socket":{
-              "id": "0",
-              "x" : "x",
-              "y" : "y"
-            }
+          "type": "Table",
+          "headers" : [{
+            "type":"plain",
+            "valueLabel": "Device"
+          }, {
+            "type":"plain",
+            "valueLabel": "Status"
+          }, {
+            "type":"plain",
+            "valueLabel": "Operating Name"
+          }, {
+            "type":"plain",
+            "valueLabel": "Log Time"
+          }, {
+            "type":"plain",
+           "valueLabel": "Register Date"
+          }, {
+            "type":"plain",
+            "valueLabel": "Street"
+          }, {
+            "type":"plain",
+            "valueLabel": "City"
+          }, {
+            "type":"plain",
+            "valueLabel": "Province"
+          }, {
+            "type":"plain",
+            "valueLabel": "Postal Code"
           }
+        ],
+          "store": [
+            ["Device 1","Active","9281-45537","Jun 7 16:34:32","2016-Mar","1860 crois. Bishop","Montreal","Quebec","J4X1K8"],
+            ["Device 2","Inactive","9281-45247","Mar 3 16:34:32","2016-Apr","123 Harvard Street","Montreal","Quebec","Q2X9S3"]
+          ]
         }
       ]
-    }
+    },
   ]
 }

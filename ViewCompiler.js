@@ -5,8 +5,8 @@ var ncp = require('ncp').ncp;
 var Promise = require('promise');
 
 const webpackGenerator = require('./webpackCompiler.js');
-const pageGenerator = require('./PageGenerator.js');
-const nodeGenerator = require('./NodeGenerator.js');
+const pageGenerator = require('./utils/PageGenerator.js');
+const nodeGenerator = require('./utils/NodeGenerator.js');
 
 process.argv.forEach(function (val, index, array) {
     console.log(index + ': ' + val);
@@ -28,7 +28,8 @@ fs.readFile(process.argv[2], 'utf8', function(err,data){
         if (err) throw err;
     })
     // Step 5, Generate a node service file that will serve up Socket.io and React files
-    nodeGenerator(config.path, config.port)
+    nodeGenerator.expressSetup(config.path, config.port);
+    nodeGenerator.socketSetup(config.path, 1);
     // Step 6, Copy lib folder into the app project
     fsPath.mkdir(config.path+'/lib', function(err){
         console.log('ok');
@@ -38,7 +39,7 @@ fs.readFile(process.argv[2], 'utf8', function(err,data){
         })
     })
     // Step 7, Generate a package.json file based on user's definition
-    fs.readFile('./Default.json', 'utf8', function (err, data) {
+    fs.readFile('./utils/Default.json', 'utf8', function (err, data) {
         var outputPackage = JSON.parse(data); //loads in default package
         if (config.package.name) outputPackage.name = config.package.name
         if (config.package.version) outputPackage.version = config.package.version
