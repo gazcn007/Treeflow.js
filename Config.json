@@ -87,40 +87,6 @@
           }
         }
       ]
-    },
-    {
-      "name" : "Dashboard",
-      "route" : "/dashboard",
-      "layout" : "default",
-      "panels" : [
-        {
-          "type": "Scatter",
-          "store": {
-            "socket":{
-              "id": "0",
-              "x" : "x",
-              "y" : "y"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name" : "Dashboard II",
-      "route" : "/dashboard-2",
-      "layout" : "default",
-      "panels" : [
-        {
-          "type": "graph",
-          "store": {
-            "socket":{
-              "id": "0",
-              "x" : "x",
-              "y" : "y"
-            }
-          }
-        }
-      ]
     }
   ]
 }

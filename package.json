@@ -1,5 +1,5 @@
 {
-  "name": "treeflow",
+  "name": "treeflow.js",
   "version": "1.0.0",
   "description": "A React+Mobx+Socket single way flow data visualization and analytics generator. ",
   "main": "ViewCompiler.js",
