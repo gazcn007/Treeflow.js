@@ -3,28 +3,31 @@ var fs = require('fs');
 var storeGenerator = require('./StoreGenerator.js');
 
 module.exports = function (pages, path) {
-    var storeNames = []/*saves Store Names*/
-    var storeDirectories = [] /*saves Store Directories*/
-    var pageNames = [] /*saves Page names */
-    var pageRoutes = [] /*saves Page routes for MainAppView() to bind pages together with react-router*/
+    var storeNames = [];/*saves Store Names*/
+    var storeDirectories = []; /*saves Store Directories*/
+    var pageNames = []; /*saves Page names */
+    var pageRoutes = []; /*saves Page routes for MainAppView() to bind pages together with react-router*/
     var socketIONeeded = false;
     pages.map(page=> {
         pageRoutes.push(page.route);
-        var panelViews = []
-        /*saves code block for static jsx panel view*/
-        var panelStoreConnectors = []
-        /*saves connectors code block in React component to the stores*/
+        var panelNames = [];
+        var panelViews = [];/*saves code block for static jsx panel view*/
+        var panelStoreConnectors = [];/*saves connectors code block in React component to the stores*/
+        var storeName;
         if (page.name) {
             pageNames.push(page.name.replace(/\s/g, ''));
             // dive into the panels first, because you need to know the list of stores needed for your panels
             // so you need to generate data layers files before writing to index.js, the main page
             // also within this mapping function, the static view code block has to be generated, so that it just need to be appened later on
             page.panels.map((panel, idx)=> {
-                var storeName = StoreFileName(panel.type);
+                panel.type = panel.type.replace(" ","").toLowerCase();
+                if(!panel.name) panel.name = panel.type.charAt(0).toUpperCase()+panel.type.slice(1);
+                panel.name = panel.name + (ExistsInArray(panelNames,panel.name)==0 ? '':ExistsInArray(panelNames,panel.name));
+                panelNames.push(panel.name);
+                storeName = panel.name+'Store';
                 storeNames.push(storeName);
                 storeDirectories.push('./'+page.name.replace(/\s/g, '')+'/'+storeName);
                 // Take Type and convert it to LowerCase to deal with different typing variations
-                panel.type = panel.type.replace(" ","").toLowerCase();
                 storeGenerator(storeName, panel, PageDirectory(page.name, path)); //@ todo future problem with too many files with the same name?
                 if (panel.type == 'formset') {
                     // Default methods for FormSet
@@ -32,20 +35,32 @@ module.exports = function (pages, path) {
                         reset: this.props." + storeName + ".reset.bind(this.props." + storeName + "),\
                         changeValue: this.props." + storeName + ".changeValue.bind(this.props." + storeName + ")\
                     }");
-                    panelViews.push("<Panel title = \"" + page.name + panel.type + "\">\
+                    panelViews.push("<Panel title = \"" + panel.name + "\">\
                         <FormSet {..." + storeName + "_formset} {..." + storeName + "Config } />\
                     </Panel>");
                 } else if (panel.type == 'table') {
                     panelStoreConnectors.push("const " + storeName + "_table = this.props."+storeName+".table;");
-                    panelViews.push("<Panel title = \"" + panel.type + "\">\
+                    panelViews.push("<Panel title = \"" + panel.name + "\">\
                         <FixTable leftCol='1' rightCol='0' left='45' right='0' className='td-inner-txt'\
                     tableList={"+storeName + "_table}/>\
                         </Panel>")
                 } else if (panel.type == 'scatter'){
                     socketIONeeded=true;
                     panelStoreConnectors.push("const " + storeName + "_scatter = this.props."+storeName+".scatter;");
-                    panelViews.push("<Panel title = \"" + panel.type + "\">\
+                    panelViews.push("<Panel title = \"" + panel.name + "\">\
                         <Echarts style={{width:'100%',height:'365px'}} option={"+storeName+"_scatter}/>\
+                    </Panel>");
+                } else if (panel.type == 'pie'){
+                    socketIONeeded=true;
+                    panelStoreConnectors.push("const " + storeName + "_pie = this.props."+storeName+".pie;");
+                    panelViews.push("<Panel title = \"" + panel.name + "\">\
+                        <Echarts style={{width:'100%',height:'365px'}} option={"+storeName+"_pie}/>\
+                    </Panel>");
+                } else if (panel.type == 'graph'){
+                    socketIONeeded=true;
+                    panelStoreConnectors.push("const " + storeName + "_graph = this.props."+storeName+".graph;");
+                    panelViews.push("<Panel title = \"" + panel.name + "\">\
+                        <Echarts style={{width:'100%',height:'365px'}} option={"+storeName+"_graph}/>\
                     </Panel>");
                 }
             });
@@ -69,7 +84,7 @@ module.exports = function (pages, path) {
                         if(!this.socket) {\
                             this.socket = io.connect('/');\
                             this.socket.on('newDataPoint', function(data){\
-                                this.props.ScatterStore.addDataPoints(data.body.x, data.body.y);\
+                                this.props."+storeName+".addDataPoints(data.body.x, data.body.y);\
                             }.bind(this));\
                         }\
                     }");
@@ -107,7 +122,6 @@ module.exports = function (pages, path) {
 // Static Asset for Code Generation utils for Pages
 // @todo currently unreadable and very ugly, find a better way to code these lines
 const PageDirectory = (pageName, path) => {return path+'/'+pageName.replace(/\s/g, '')};
-const StoreFileName = (panelName) => {return panelName+'Store'};
 const RootFileName = (pageName,path) => {return PageDirectory(pageName,path)+'/index.js'};
 const RootFileDependencies = "import React from 'react';\
 import {inject, observer} from 'mobx-react';\
@@ -156,3 +170,12 @@ const MainAppView = (pageRoutes,pageNames) =>{
                     }).join('\n')+ "</div></Router></Provider>, app)"
 }
 
+const ExistsInArray = ((array, wordToCheck)=>{
+    var count = 0;
+    for (var i = 0; i < array.length; i++) {
+        if (array[i] === wordToCheck) {
+            count++;
+        }
+    }
+    return count;
+})

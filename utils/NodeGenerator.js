@@ -17,6 +17,8 @@ module.exports = {
             ws.writeLine(ImportDependencies);
             ws.writeLine(WebpackSetup);
             ws.writeLine(AppSetup(port));
+            ws.writeLine(SocketIOSetup);
+
         });
     },
     socketSetup: function (path,socketId) {
@@ -58,7 +60,8 @@ const AppSetup = (port) => {
     app.get('*', (req, res) => {\
     console.log('Orignal Path: ' + req.url);\
     res.sendFile(__dirname+'/index.html');\
-    });";
+    });\
+    console.log('Server Has Been Hosted On Port : "+port+"');";
 };
 
 const SocketIOSetup = "io.on('connection', socket => {\

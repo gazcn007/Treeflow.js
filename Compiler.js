@@ -4,7 +4,7 @@ var fsPath = require('fs-path');
 var ncp = require('ncp').ncp;
 var Promise = require('promise');
 
-const webpackGenerator = require('./webpackCompiler.js');
+const webpackGenerator = require('./utils/WebpackGenerator.js');
 const pageGenerator = require('./utils/PageGenerator.js');
 const nodeGenerator = require('./utils/NodeGenerator.js');
 
@@ -28,8 +28,8 @@ fs.readFile(process.argv[2], 'utf8', function(err,data){
         if (err) throw err;
     })
     // Step 5, Generate a node service file that will serve up Socket.io and React files
+    // nodeGenerator.socketSetup(config.path, 1);
     nodeGenerator.expressSetup(config.path, config.port);
-    nodeGenerator.socketSetup(config.path, 1);
     // Step 6, Copy lib folder into the app project
     fsPath.mkdir(config.path+'/lib', function(err){
         console.log('ok');
