@@ -65,12 +65,12 @@
           ],
           "actionList": [
             {
-            "type":"button",
-            "dispLabel": "Add",
-            "value": "",
-            "className": "btn-primary",
-            "trigger": "addData"
-          },
+              "type":"button",
+              "dispLabel": "Add",
+              "value": "",
+              "className": "btn-primary",
+              "trigger": "addData"
+            },
             {
               "type":"button",
               "dispLabel": "Reset",
@@ -94,10 +94,20 @@
       "layout" : "default",
       "panels" : [
         {
-          "type": "Scatter",
+          "type": "graph",
           "store": {
             "socket":{
               "id": "0",
+              "x" : "x",
+              "y" : "y"
+            }
+          }
+        },
+        {
+          "type": "graph",
+          "store": {
+            "socket":{
+              "id": "1",
               "x" : "x",
               "y" : "y"
             }

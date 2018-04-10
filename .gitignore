@@ -1,2 +1,4 @@
 node_modules/
 app/
+jview.iml
+package-lock.json

@@ -6,9 +6,9 @@ setInterval(()=>{
     var data = {}
     data.x=x;
     data.y=Math.floor((Math.random() * 30) + 1);
-    data.deviceId = 2;
+    data.gateIndex = 0;
     x++;
     console.log("pushed data.x: "+data.x+" data.y: "+data.y);
     socket.emit('newDataPoint', data);
-}, 1500);
+}, 500);
 

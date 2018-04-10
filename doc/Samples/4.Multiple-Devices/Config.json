@@ -7,7 +7,6 @@
   },
   "path" : "./app",
   "port" : "3000",
-  "maxMemorySize" : "30",
   "pages" : [
     {
       "name" : "Data Panel",
@@ -95,19 +94,7 @@
       "layout" : "default",
       "panels" : [
         {
-          "type": "stacked-graph",
-          "windowSize":"20",
-          "store": {
-            "socket":{
-              "id": "0",
-              "x" : "x",
-              "y" : "y"
-            }
-          }
-        },
-        {
-          "type": "scatter",
-          "windowSize":"20",
+          "type": "graph",
           "store": {
             "socket":{
               "id": "0",

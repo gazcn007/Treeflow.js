@@ -7,7 +7,6 @@
   },
   "path" : "./app",
   "port" : "3000",
-  "maxMemorySize" : "30",
   "pages" : [
     {
       "name" : "Data Panel",
@@ -66,12 +65,12 @@
           ],
           "actionList": [
             {
-              "type":"button",
-              "dispLabel": "Add",
-              "value": "",
-              "className": "btn-primary",
-              "trigger": "addData"
-            },
+            "type":"button",
+            "dispLabel": "Add",
+            "value": "",
+            "className": "btn-primary",
+            "trigger": "addData"
+          },
             {
               "type":"button",
               "dispLabel": "Reset",
@@ -95,19 +94,7 @@
       "layout" : "default",
       "panels" : [
         {
-          "type": "stacked-graph",
-          "windowSize":"20",
-          "store": {
-            "socket":{
-              "id": "0",
-              "x" : "x",
-              "y" : "y"
-            }
-          }
-        },
-        {
-          "type": "scatter",
-          "windowSize":"20",
+          "type": "Graph",
           "store": {
             "socket":{
               "id": "0",
