@@ -3,9 +3,9 @@
 
 <p align="center">
   <img src="./doc/treeflow.png">
+  "The purpose of art is washing the dust of daily life off our souls"
 </p>
 
-"The purpose of art is washing the dust of daily life off our souls"
 
 ![](/doc/treeflow.gif)
 
