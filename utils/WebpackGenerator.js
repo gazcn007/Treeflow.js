@@ -26,10 +26,13 @@ module.exports = {\n\
                 test: /\.less$/,\n\
                 loader:'style!css!less'\n\
             },\n\
-            { test: /\.(jpe?g|png|gif|svg)$/i,loaders: [\n\
-                'file?hash=sha512&digest=hex&name=[hash].[ext]',\n\
-                'image-webpack?bypassOnDebug&optimizationLevel=7&interlaced=false'\n\
-            ]}\n\
+            {\n\
+                test: /\.(png|jpg|gif|svg)$/i,\n\
+                loaders: [\n\
+                    'url-loader?limit=4000&name=[name]-[hash:5].[ext]',\n\
+                    'image-webpack-loader'\n\
+                ]\n\
+            }\n\
         ]\n\
     },\n\
     devServer:{\n\

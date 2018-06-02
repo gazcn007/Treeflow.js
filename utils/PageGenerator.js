@@ -25,6 +25,7 @@ module.exports = function (pages, path) {
 
         // Each page should have a page name, otherwise the NavMenu will have problem
         if (page.name) {
+            let ifTemplate = false;
             // save this page name to later genearte routing and NavMenu
             pageNames.push(page.name.replace(/\s/g, ''));
             /* dive into the panels first, because you need to know the list of stores needed for your panels
@@ -43,11 +44,26 @@ module.exports = function (pages, path) {
 
                 panel.name = panel.name + __ExistsInArray(panelNames,panel.name);
                 panelNames.push(panel.name);
-                storeName = panel.name+'Store';
-                storeNames.push(storeName);
-                storeDirectories.push('./'+page.name.replace(/\s/g, '')+'/'+storeName);
-                // Take Type and convert it to LowerCase to deal with different typing variations
-                storeGenerator(storeName, panel, __PageDirectory(page.name, path)); //@ todo future problem with too many files with the same name?
+                if(panel.type == 'diagram'){
+                    fs.readFile('./utils/Templates/Diagram.jvt', 'utf8', function (err,data) {
+                      if (err) {
+                        return console.log(err);
+                      }
+                      var result = data.replace(/@IMPORTS@/g, 'replacement');
+                      fsPath.writeFile(__RootFileName(page.name, path), result, function (err, data) {
+
+                         if (err) return console.log(err);
+                      });
+                    });
+                    ifTemplate = true;
+                } else {
+                    storeName = panel.name+'Store';
+                    storeNames.push(storeName);
+                    storeDirectories.push('./'+page.name.replace(/\s/g, '')+'/'+storeName);
+                    // Take Type and convert it to LowerCase to deal with different typing variations
+                    storeGenerator(storeName, panel, __PageDirectory(page.name, path)); //@ todo future problem with too many files with the same name?
+                }
+
                 if (panel.type == 'formset') {
                     // Default methods for FormSet
                     panelStoreConnectors.push("const " + storeName + "_formset = this.props."+storeName+".formset;\nconst " + storeName + "Config = {\
@@ -90,51 +106,54 @@ module.exports = function (pages, path) {
                 }
             });
 
-            //After knowing the store, generate page file in ES6 and React
-            fsPath.writeFile(__RootFileName(page.name, path), '// Root File for Page ' + page.name, function (err, data) {
-                if (err) throw err;
-                console.log('Root File Created for Page : ' + page.name);
+            if(ifTemplate == false){
+                
+                //After knowing the store, generate page file in ES6 and React
+                fsPath.writeFile(__RootFileName(page.name, path), '// Root File for Page ' + page.name, function (err, data) {
+                    if (err) throw err;
+                    console.log('Root File Created for Page : ' + page.name);
 
-                // Create a write stream, and add in the writeLine() method
-                var ws = fs.createWriteStream(__RootFileName(page.name, path), {flags: 'a'});
-                ws.writeLine = (str)=> {
-                    ws.write('\n');
-                    ws.write(str);
-                };
-                ws.writeLine(__RootFileDependencies__);
-                ws.writeLine(__StoreInjection(storeNames));
-                ws.writeLine(__ClassHeader(page.name.replace(" ", "")));
-                if(sockets.length != 0){
-                    ws.writeLine("componentDidMount(){\
-                        if(!this.socket) {\
-                            this.socket = io.connect('/');\
-                            this.socket.on('newDataPoint', function(data){\
-                                "+sockets.map((e,idx)=>{
-                                    return "if(data.body.id=="+e.id+")this.props."+e.storeName+".addDataPoints(data.body.x, data.body.y, data.body.gateIndex)"
-                                }).join('\n')+"}.bind(this));\
-                            this.socket.on('setArray', function(data){"+
-                                sockets.map((e,idx)=>{
-                                    return "if(data.body.id=="+e.id+")this.props."+e.storeName+".setArray(data.array, data.body.gateIndex)"
-                                }).join('\n')+"}.bind(this));"+"}}");
-                }
-                ws.writeLine("render(){" + panelStoreConnectors[0]);
-                if(panelStoreConnectors.length>1){
-                    var index = 1;
-                    while(index<panelStoreConnectors.length){
-                        ws.writeLine(panelStoreConnectors[index]);
-                        index ++;
+                    // Create a write stream, and add in the writeLine() method
+                    var ws = fs.createWriteStream(__RootFileName(page.name, path), {flags: 'a'});
+                    ws.writeLine = (str)=> {
+                        ws.write('\n');
+                        ws.write(str);
+                    };
+                    ws.writeLine(__RootFileDependencies__);
+                    ws.writeLine(__StoreInjection(storeNames));
+                    ws.writeLine(__ClassHeader(page.name.replace(" ", "")));
+                    if(sockets.length != 0){
+                        ws.writeLine("componentDidMount(){\
+                            if(!this.socket) {\
+                                this.socket = io.connect('/');\
+                                this.socket.on('newDataPoint', function(data){\
+                                    "+sockets.map((e,idx)=>{
+                                        return "if(data.body.id=="+e.id+")this.props."+e.storeName+".addDataPoints(data.body.x, data.body.y, data.body.gateIndex)"
+                                    }).join('\n')+"}.bind(this));\
+                                this.socket.on('setArray', function(data){"+
+                                    sockets.map((e,idx)=>{
+                                        return "if(data.body.id=="+e.id+")this.props."+e.storeName+".setArray(data.array, data.body.gateIndex)"
+                                    }).join('\n')+"}.bind(this));"+"}}");
                     }
-                }
-                ws.writeLine("return <div>" + panelViews[0] );
-                if(panelViews.length>1){
-                    var index = 1;
-                    while(index<panelViews.length){
-                        ws.writeLine(panelViews[index]);
-                        index ++;
+                    ws.writeLine("render(){" + panelStoreConnectors[0]);
+                    if(panelStoreConnectors.length>1){
+                        var index = 1;
+                        while(index<panelStoreConnectors.length){
+                            ws.writeLine(panelStoreConnectors[index]);
+                            index ++;
+                        }
                     }
-                }
-                ws.writeLine(__ClassFooter__);
-            });
+                    ws.writeLine("return <div>" + panelViews[0] );
+                    if(panelViews.length>1){
+                        var index = 1;
+                        while(index<panelViews.length){
+                            ws.writeLine(panelViews[index]);
+                            index ++;
+                        }
+                    }
+                    ws.writeLine(__ClassFooter__);
+                });
+            }
         } else {
             throw 'Page Name Missing';
         }
