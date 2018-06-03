@@ -6,7 +6,7 @@
 </p>
 
 
-![](/doc/treeflow.gif)
+![](/doc/graph.gif)
 
 ## Introduction
 
@@ -47,6 +47,9 @@ npm run sample-3
 npm run sample-4
 npm run sample-5
 npm run sample-6
+npm run sample-7
+npm run sample-8
+npm run sample-9
 
 //then checkout ./app folder
 // or host files
@@ -59,4 +62,12 @@ node app/Data-Mocker.js
 // to read beautified code, run this after compilation and generation of the app folder
 npm run beautify
 ```
+
+## Updates
+
+- [x] Bug Fixes
+- [x] Newly added topology diagram:
+
+![](/doc/topology.gif)
+ 
 
