@@ -103,7 +103,7 @@ module.exports = {
             ],
             series: data.map((e,idx)=>{
                 var obj = {};
-                obj.name = 'device-'+idx;
+                obj.name = 'Device-'+idx;
                 obj.type = 'line';
                 obj.smooth = false;
                 obj.data = e;
@@ -159,7 +159,7 @@ module.exports = {
             ],
             series: data.map((e,idx)=>{
                 var obj = {};
-                obj.name = 'device-'+idx;
+                obj.name = 'Device-'+idx;
                 obj.type = 'line';
                 obj.smooth = false;
                 obj.data = e;
@@ -181,7 +181,6 @@ module.exports = {
 
         var option = {
         title: {
-            text: 'Linear Regression',
             subtext: '',
             left: 'center'
         },
@@ -190,6 +189,9 @@ module.exports = {
             axisPointer:{
                 type: 'cross'
             }
+        },
+        legend:{
+            data: data.map((e,idx)=>{return 'Device-'+idx;})
         },
         dataZoom: {
             show: true,
@@ -215,7 +217,7 @@ module.exports = {
         },
         series: data.map((e,idx)=>{
             var obj = {};
-            obj.name = 'device-'+idx;
+            obj.name = 'Device-'+idx;
             obj.type = 'scatter';
             obj.label = {
                 emphasis:{
